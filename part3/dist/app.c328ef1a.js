@@ -119,16 +119,32 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   return newRequire;
 })({"app.js":[function(require,module,exports) {
 var ajax = new XMLHttpRequest();
-ajax.open('GET', 'https://api.hnpwa.com/v0/news/1.json', false);
+var NEWS_URL = 'https://api.hnpwa.com/v0/news/1.json';
+var CONTENT_URL = 'https://api.hnpwa.com/v0/item/@id.json';
+var root = document.getElementById('root');
+var content = document.createElement('div');
+ajax.open('GET', NEWS_URL, false);
 ajax.send();
 var newsFeed = JSON.parse(ajax.response);
 var ul = document.createElement('ul');
+window.addEventListener('hashchange', function () {
+  ajax.open('GET', CONTENT_URL.replace('@id', location.hash.substring(1)), false);
+  ajax.send();
+  var newsContent = JSON.parse(ajax.response);
+  var title = document.createElement('h1');
+  title.innerHTML = newsContent.title;
+  content.appendChild(title);
+});
 newsFeed.forEach(function (news) {
   var li = document.createElement('li');
-  li.innerHTML = "<li>".concat(news.title, "</li>");
+  var a = document.createElement('a');
+  a.innerHTML = "".concat(news.title, " (").concat(news.comments_count, ")");
+  a.href = "#".concat(news.id);
+  li.appendChild(a);
   ul.appendChild(li);
 });
-document.getElementById('root').appendChild(ul);
+root.appendChild(ul);
+root.appendChild(content);
 },{}],"../../../.nvm/versions/node/v20.8.1/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -154,7 +170,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54935" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65531" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
